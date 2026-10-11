@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adyen Drop-in Demo · Result</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="/">Demo<span>Shop</span></a>
+    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
+    <nav><a href="/how-it-works">How it works</a></nav>
+  </header>
+  <main class="layout">
+    <section>
+      <div class="card">
+        <div class="result-icon" id="icon"></div>
+        <h1 id="headline"></h1>
+        <p class="muted" id="explain"></p>
+        <a class="btn" href="/">Back to shop</a>
+      </div>
+
+      <div class="card">
+        <h2>What each layer says</h2>
+        <p class="muted">The Drop-in result is good for the shopper's UI. Order fulfilment should wait for the
+          <code>AUTHORISATION</code> webhook, which is the source of truth.</p>
+        <dl class="kv">
+          <dt>Client (Drop-in)</dt><dd id="client-result">–</dd>
+          <dt>Server (GET /sessions/{id})</dt><dd id="server-result">–</dd>
+          <dt>Webhook (order status)</dt><dd id="webhook-result">waiting…</dd>
+          <dt>Merchant reference</dt><dd id="reference">–</dd>
+          <dt>PSP reference</dt><dd id="psp">–</dd>
+        </dl>
+      </div>
+    </section>
+    <aside class="card inspector" id="inspector"></aside>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/inspector.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const reference = params.get("reference");
+    const resultCode = params.get("resultCode") || "Error";
+    const sessionId = params.get("sessionId");
+    const sessionResult = params.get("sessionResult");
+
+    const copy = {
+      Authorised: ["✓", "Payment authorised", "The issuer approved the payment. Funds are reserved and will be captured (automatically by default)."],
+      Pending: ["⏳", "Payment pending", "The final result isn't known yet (e.g. bank transfer, some wallets). Wait for the webhook."],
+      Received: ["⏳", "Payment received", "Adyen received the payment; the final result arrives via webhook."],
+      Refused: ["✗", "Payment refused", "The issuer or risk rules declined the payment. Ask the shopper to try another method."],
+      Cancelled: ["✗", "Payment cancelled", "The shopper cancelled the payment."],
+      Error: ["!", "Something went wrong", "A technical error happened. Check the inspector for details."],
+    };
+    const [icon, headline, explain] = copy[resultCode] || copy.Error;
+    document.getElementById("icon").textContent = icon;
+    document.getElementById("icon").className = `result-icon result-${resultCode}`;
+    document.getElementById("headline").textContent = headline;
+    document.getElementById("explain").textContent = explain;
+    document.getElementById("client-result").textContent = resultCode;
+    document.getElementById("reference").textContent = reference || "–";
+
+    if (sessionId && sessionResult) {
+      fetch(`/api/sessions/${encodeURIComponent(sessionId)}/result?sessionResult=${encodeURIComponent(sessionResult)}`)
+        .then((r) => r.json())
+        .then((r) => (document.getElementById("server-result").textContent = r.status || r.error || "–"));
+    } else {
+      document.getElementById("server-result").textContent = "n/a (no sessionResult)";
+    }
+
+    // Poll our own order store, which the webhook handler updates.
+    let attempts = 0;
+    async function pollOrder() {
+      if (!reference) return;
+      const res = await fetch(`/api/orders/${encodeURIComponent(reference)}`);
+      if (res.ok) {
+        const order = await res.json();
+        document.getElementById("webhook-result").textContent =
+          order.webhooks.length ? `${order.status} (${order.webhooks.map((w) => w.eventCode).join(", ")})` : "waiting for webhook…";
+        if (order.pspReference) document.getElementById("psp").textContent = order.pspReference;
+        if (order.webhooks.length) return;
+      }
+      if (++attempts < 30) setTimeout(pollOrder, 2000);
+      else document.getElementById("webhook-result").textContent = "no webhook received (is the webhook URL configured and publicly reachable?)";
+    }
+    pollOrder();
+  </script>
+</body>
+</html>

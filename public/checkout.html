@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adyen Drop-in Demo · Checkout</title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Adyen Web v6.45.2 from Adyen's TEST CDN (use checkoutshopper-live.cdn.adyen.com in production).
+       Copy the integrity="sha384-..." values for this version from the Adyen docs / release notes. -->
+  <link rel="stylesheet" href="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.css" crossorigin="anonymous">
+  <script src="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="/">Demo<span>Shop</span></a>
+    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
+    <nav><a href="/how-it-works">How it works</a><a href="/">← Back to cart</a></nav>
+  </header>
+
+  <main class="layout">
+    <section>
+      <div class="card">
+        <h1>Checkout</h1>
+        <div id="order-summary" class="muted">Loading order…</div>
+      </div>
+
+      <div class="card">
+        <h2>Drop-in options <span class="muted">(each change creates a new session and remounts Drop-in)</span></h2>
+        <div class="controls">
+          <label>Country <select id="country"></select></label>
+          <label><input type="checkbox" id="opt-holder" checked> Card holder name</label>
+          <label><input type="checkbox" id="opt-billing"> Billing address</label>
+          <label><input type="checkbox" id="opt-open-first" checked> Open first method</label>
+          <label><input type="checkbox" id="opt-store"> Tokenise (save card + show stored)</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Payment</h2>
+        <div id="status" class="status-banner"></div>
+        <div id="dropin-container"></div>
+      </div>
+    </section>
+
+    <aside class="card inspector" id="inspector"></aside>
+  </main>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/inspector.js"></script>
+  <script src="/js/checkout.js"></script>
+</body>
+</html>

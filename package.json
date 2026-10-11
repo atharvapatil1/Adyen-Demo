@@ -1,0 +1,28 @@
+{
+  "name": "adyen-sessions-dropin-demo",
+  "version": "1.0.0",
+  "description": "Adyen online payments demo: Sessions flow with Web Drop-in v6",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atharvapatil1/Adyen-Demo.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atharvapatil1/Adyen-Demo/issues"
+  },
+  "homepage": "https://github.com/atharvapatil1/Adyen-Demo#readme",
+  "dependencies": {
+    "@adyen/api-library": "^32.2.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

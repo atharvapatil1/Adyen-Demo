@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adyen Drop-in Demo · Finalising payment</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.css" crossorigin="anonymous">
+  <script src="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="/">Demo<span>Shop</span></a>
+    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
+  </header>
+  <main class="layout">
+    <section class="card">
+      <h1>Finalising your payment…</h1>
+      <p class="muted">The shopper came back from a redirect (e.g. iDEAL or a 3DS page). Adyen appended
+        <code>sessionId</code> and <code>redirectResult</code> to our <code>returnUrl</code>. We hand them to
+        <code>checkout.submitDetails()</code> to get the final result.</p>
+      <div id="status" class="status-banner"></div>
+      <div id="redirect-container"></div>
+    </section>
+    <aside class="card inspector" id="inspector"></aside>
+  </main>
+  <script src="/js/common.js"></script>
+  <script src="/js/inspector.js"></script>
+  <script src="/js/redirect.js"></script>
+</body>
+</html>

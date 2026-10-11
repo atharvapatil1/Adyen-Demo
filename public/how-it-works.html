@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adyen Drop-in Demo · How it works</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="/">Demo<span>Shop</span></a>
+    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
+    <nav><a href="/">Shop</a></nav>
+  </header>
+  <main class="layout single">
+    <section>
+      <div class="card">
+        <h1>Sessions flow with Drop-in</h1>
+        <p class="muted">One API call from your server, everything else is handled by Drop-in in the browser.</p>
+        <ol class="flow">
+          <li><strong>Shopper clicks checkout.</strong> The browser sends the cart (item ids + quantities) to <code>POST /api/sessions</code>.</li>
+          <li><strong>Server → Adyen <code>POST /sessions</code></strong> with the API key: <code>merchantAccount</code>, <code>amount</code> (calculated server-side), <code>reference</code>, <code>returnUrl</code>, <code>countryCode</code>, <code>lineItems</code>, and optionally <code>shopperReference</code> for tokenisation.</li>
+          <li><strong>Adyen returns <code>id</code> + <code>sessionData</code>.</strong> The server passes only these to the browser.</li>
+          <li><strong>Browser creates <code>AdyenCheckout({ session, clientKey, environment })</code></strong> and mounts <code>new Dropin(checkout)</code>. Drop-in fetches the payment methods enabled for this country/currency/amount.</li>
+          <li><strong>Shopper pays.</strong> Card data is encrypted in Adyen-hosted fields (PCI SAQ A). Drop-in calls Adyen directly and handles 3DS2, QR codes and redirects.</li>
+          <li><strong>Redirect methods</strong> return the shopper to <code>returnUrl?sessionId=…&amp;redirectResult=…</code>; the page calls <code>checkout.submitDetails()</code>.</li>
+          <li><strong><code>onPaymentCompleted</code> / <code>onPaymentFailed</code></strong> give the result for the shopper's UI.</li>
+          <li><strong>Adyen sends an <code>AUTHORISATION</code> webhook</strong> to the server. Verify its HMAC, deduplicate, respond 2xx, and update the order. This is the source of truth for fulfilment.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h2>Test data</h2>
+        <dl class="kv">
+          <dt>Visa (3DS2 challenge)</dt><dd>4917 6100 0000 0000 · 03/30 · 737</dd>
+          <dt>Mastercard</dt><dd>5555 3412 4444 1115 · 03/30 · 737</dd>
+          <dt>Amex</dt><dd>3700 0000 0000 002 · 03/30 · 7373</dd>
+          <dt>3DS2 password</dt><dd>password</dd>
+          <dt>Refusal</dt><dd>Use holder name <code>DECLINED</code> or a wrong CVC</dd>
+          <dt>iDEAL (country NL)</dt><dd>Pick any test bank, then choose the outcome on the simulator</dd>
+        </dl>
+        <p class="muted">Full list: <a href="https://docs.adyen.com/development-resources/testing/test-card-numbers" target="_blank" rel="noopener">Adyen test card numbers</a>.</p>
+      </div>
+
+      <div class="card">
+        <h2>Sessions vs Advanced flow</h2>
+        <dl class="kv">
+          <dt>Sessions (this demo)</dt><dd style="font-family:inherit">One server endpoint (/sessions). Fastest to build; Adyen manages the payment lifecycle from the client.</dd>
+          <dt>Advanced</dt><dd style="font-family:inherit">Three endpoints (/paymentMethods, /payments, /payments/details). Full control, e.g. to change the amount or add data right before /payments, or run your own logic between steps.</dd>
+        </dl>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
