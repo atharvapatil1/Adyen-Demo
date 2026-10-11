@@ -2,6 +2,10 @@ require("dotenv").config();
 
 const required = ["ADYEN_API_KEY", "ADYEN_CLIENT_KEY", "ADYEN_MERCHANT_ACCOUNT"];
 
+// Keys copied from PDFs or chat often carry invisible zero-width characters or stray spaces.
+const clean = (value) => (value || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
+for (const key of [...required, "ADYEN_HMAC_KEY"]) process.env[key] = clean(process.env[key]);
+
 const config = {
   apiKey: process.env.ADYEN_API_KEY,
   clientKey: process.env.ADYEN_CLIENT_KEY,

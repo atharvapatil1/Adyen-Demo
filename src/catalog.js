@@ -1,8 +1,10 @@
+const crypto = require("crypto");
+
 // The server owns prices. The browser only sends item ids and quantities,
 // so a shopper can't change the amount they're charged.
 const products = {
-  sunglasses: { name: "Sunglasses", price: 5000, image: "/images/sunglasses.svg" },
-  headphones: { name: "Headphones", price: 5000, image: "/images/headphones.svg" },
+  sunglasses: { name: "Kestrel Aviator Sunglasses", price: 9500, image: "/images/sunglasses.svg" },
+  headphones: { name: "Kestrel Studio Headphones", price: 14900, image: "/images/headphones.svg" },
 };
 
 // Country drives currency, locale and which payment methods Drop-in shows.
@@ -41,4 +43,17 @@ function buildOrder(items, countryCode) {
   return { amount: { currency: country.currency, value }, lineItems, locale: country.locale };
 }
 
-module.exports = { products, countries, buildOrder };
+function newReference() {
+  return `ORDER-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`;
+}
+
+// Tokenisation: with a shopperReference, Drop-in shows the shopper's stored cards.
+// Use your own stable customer id in production.
+const DEMO_SHOPPER_REFERENCE = "demo-shopper-001";
+const tokenisationFields = {
+  shopperReference: DEMO_SHOPPER_REFERENCE,
+  recurringProcessingModel: "CardOnFile",
+  shopperInteraction: "Ecommerce",
+};
+
+module.exports = { products, countries, buildOrder, newReference, DEMO_SHOPPER_REFERENCE, tokenisationFields };

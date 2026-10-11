@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adyen Drop-in Demo · Checkout</title>
+  <title>Kestrel &amp; Co. · Checkout</title>
   <link rel="stylesheet" href="/css/style.css">
 
   <!-- Adyen Web v6.45.2 from Adyen's TEST CDN (use checkoutshopper-live.cdn.adyen.com in production).
@@ -13,9 +13,9 @@
 </head>
 <body>
   <header class="top">
-    <a class="logo" href="/">Demo<span>Shop</span></a>
-    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
-    <nav><a href="/how-it-works">How it works</a><a href="/">← Back to cart</a></nav>
+    <a class="logo" href="/">Kestrel<span>&amp;Co.</span></a>
+    <span class="tag">Adyen TEST · Adyen Web v6.45.2</span>
+    <nav><a href="/">Shop</a><a href="/case-study">Case study</a><a href="/how-it-works">How it works</a></nav>
   </header>
 
   <main class="layout">
@@ -26,13 +26,26 @@
       </div>
 
       <div class="card">
-        <h2>Drop-in options <span class="muted">(each change creates a new session and remounts Drop-in)</span></h2>
-        <div class="controls">
-          <label>Country <select id="country"></select></label>
-          <label><input type="checkbox" id="opt-holder" checked> Card holder name</label>
-          <label><input type="checkbox" id="opt-billing"> Billing address</label>
-          <label><input type="checkbox" id="opt-open-first" checked> Open first method</label>
-          <label><input type="checkbox" id="opt-store"> Tokenise (save card + show stored)</label>
+        <h2>Integration path</h2>
+        <div class="option-grid">
+          <div>
+            <div class="option-label">Backend flow</div>
+            <div class="segmented" data-name="flow">
+              <label><input type="radio" name="flow" value="sessions" checked><span>Sessions <small>1 endpoint</small></span></label>
+              <label><input type="radio" name="flow" value="advanced"><span>Advanced <small>3 endpoints</small></span></label>
+            </div>
+          </div>
+          <div>
+            <div class="option-label">Frontend</div>
+            <div class="segmented" data-name="ui">
+              <label><input type="radio" name="ui" value="dropin" checked><span>Drop-in <small>all methods</small></span></label>
+              <label><input type="radio" name="ui" value="components"><span>Components <small>Google Pay + Card</small></span></label>
+            </div>
+          </div>
+          <div>
+            <div class="option-label">Shopper country</div>
+            <select id="country"></select>
+          </div>
         </div>
       </div>
 
@@ -40,14 +53,66 @@
         <h2>Payment</h2>
         <div id="status" class="status-banner"></div>
         <div id="dropin-container"></div>
+        <div id="components-container" class="hidden">
+          <div id="googlepay-section">
+            <div class="option-label">Express checkout</div>
+            <div id="googlepay-container"></div>
+            <p id="googlepay-note" class="muted hidden"></p>
+          </div>
+          <div class="divider"><span>or pay with card</span></div>
+          <div id="card-container"></div>
+        </div>
       </div>
+
+      <details class="card options" open>
+        <summary><h2>Customise the UI</h2><span class="muted">UI-only changes remount on the same session</span></summary>
+        <div class="option-columns">
+          <fieldset>
+            <legend>Google Pay button</legend>
+            <label>Type
+              <select data-opt="gpButtonType">
+                <option>buy</option><option>pay</option><option>checkout</option><option>order</option><option>plain</option><option>book</option><option>donate</option><option>subscribe</option>
+              </select>
+            </label>
+            <label>Color
+              <select data-opt="gpButtonColor"><option>default</option><option>black</option><option>white</option></select>
+            </label>
+            <label>Size mode
+              <select data-opt="gpButtonSizeMode"><option>fill</option><option>static</option></select>
+            </label>
+            <label>Corner radius <input type="range" min="0" max="24" value="4" data-opt="gpButtonRadius"><output>4</output></label>
+          </fieldset>
+          <fieldset>
+            <legend>Google Pay sheet</legend>
+            <label><input type="checkbox" data-opt="gpEmailRequired"> Ask for email</label>
+            <label><input type="checkbox" data-opt="gpBillingAddressRequired"> Ask for billing address</label>
+            <label><input type="checkbox" data-opt="gpShippingAddressRequired"> Ask for shipping address</label>
+            <label><input type="checkbox" data-opt="gpExistingPaymentMethodRequired"> Only show if shopper has a saved card</label>
+          </fieldset>
+          <fieldset>
+            <legend>Card &amp; Drop-in</legend>
+            <label><input type="checkbox" data-opt="cardHolderName" checked> Card holder name</label>
+            <label><input type="checkbox" data-opt="cardBillingAddress"> Billing address</label>
+            <label><input type="checkbox" data-opt="dropinOpenFirst" checked> Open first method (Drop-in)</label>
+            <label><input type="checkbox" data-opt="tokenise"> <span>Tokenise (save card) <small class="muted">· new session</small></span></label>
+          </fieldset>
+        </div>
+      </details>
     </section>
 
-    <aside class="card inspector" id="inspector"></aside>
+    <aside class="card inspector side">
+      <div class="tabs">
+        <button type="button" class="active" data-tab="inspector">Inspector</button>
+        <button type="button" data-tab="code-panel">Code</button>
+      </div>
+      <div id="inspector" class="panel"></div>
+      <div id="code-panel" class="panel code-panel hidden"></div>
+    </aside>
   </main>
 
   <script src="/js/common.js"></script>
   <script src="/js/inspector.js"></script>
+  <script src="/js/snippets.js"></script>
   <script src="/js/checkout.js"></script>
 </body>
 </html>

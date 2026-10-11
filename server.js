@@ -13,8 +13,12 @@ const app = express();
 app.set("trust proxy", true);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
+app.use("/vendor", express.static(path.join(__dirname, "node_modules/mermaid/dist"), { index: false }));
+
+app.use("/case-study", require("./src/routes/caseStudy"));
 
 app.use("/api", require("./src/routes/payments"));
+app.use("/api/advanced", require("./src/routes/advanced"));
 app.use("/api/webhooks", require("./src/routes/webhooks"));
 
 app.use((err, req, res, next) => {

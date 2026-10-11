@@ -3,22 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adyen Drop-in Demo · Finalising payment</title>
+  <title>Kestrel &amp; Co. · Finalising payment</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.css" crossorigin="anonymous">
   <script src="https://checkoutshopper-test.cdn.adyen.com/checkoutshopper/sdk/6.45.2/adyen.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <header class="top">
-    <a class="logo" href="/">Demo<span>Shop</span></a>
-    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
+    <a class="logo" href="/">Kestrel<span>&amp;Co.</span></a>
+    <span class="tag">Adyen TEST · Adyen Web v6.45.2</span>
+    <nav><a href="/">Shop</a><a href="/case-study">Case study</a><a href="/how-it-works">How it works</a></nav>
   </header>
   <main class="layout">
     <section class="card">
       <h1>Finalising your payment…</h1>
       <p class="muted">The shopper came back from a redirect (e.g. iDEAL or a 3DS page). Adyen appended
-        <code>sessionId</code> and <code>redirectResult</code> to our <code>returnUrl</code>. We hand them to
-        <code>checkout.submitDetails()</code> to get the final result.</p>
+        <code>redirectResult</code> (and <code>sessionId</code> in the Sessions flow) to our <code>returnUrl</code>.
+        Sessions flow: <code>checkout.submitDetails()</code>. Advanced flow: our server calls <code>/payments/details</code>.</p>
       <div id="status" class="status-banner"></div>
       <div id="redirect-container"></div>
     </section>

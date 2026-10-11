@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Adyen Drop-in Demo · How it works</title>
+  <title>Kestrel &amp; Co. · How it works</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header class="top">
-    <a class="logo" href="/">Demo<span>Shop</span></a>
-    <span class="tag">Adyen TEST · Sessions flow · Drop-in v6.45.2</span>
-    <nav><a href="/">Shop</a></nav>
+    <a class="logo" href="/">Kestrel<span>&amp;Co.</span></a>
+    <span class="tag">Adyen TEST · Adyen Web v6.45.2</span>
+    <nav><a href="/">Shop</a><a href="/case-study">Case study</a><a href="/how-it-works">How it works</a></nav>
   </header>
   <main class="layout single">
     <section>
@@ -30,6 +30,18 @@
       </div>
 
       <div class="card">
+        <h2>Google Pay with Adyen</h2>
+        <ol class="flow">
+          <li><strong>Enable Google Pay</strong> on your merchant account in the Customer Area. It then appears in <code>/paymentMethods</code> (or in the session) with its configuration (<code>gatewayMerchantId</code>, <code>merchantId</code>).</li>
+          <li><strong>Drop-in</strong> shows the Google Pay button automatically once <code>isAvailable()</code> passes. Customise it under <code>paymentMethodsConfiguration.googlepay</code>.</li>
+          <li><strong>Components</strong>: <code>new GooglePay(checkout, config)</code>, check <code>isAvailable()</code>, then mount it anywhere, e.g. as an express button on the cart or product page.</li>
+          <li><strong>Shopper approves in the Google Pay sheet.</strong> <code>onAuthorized(data, actions)</code> gives you email and addresses to validate; call <code>actions.resolve()</code> or <code>actions.reject()</code>.</li>
+          <li><strong>Adyen Web sends the encrypted Google Pay token</strong> as <code>paymentMethod.googlePayToken</code>. In the Sessions flow it goes straight to Adyen; in the Advanced flow it arrives at your <code>/payments</code> call. 3DS2 is handled like a card when the issuer asks for it.</li>
+        </ol>
+        <p class="muted">Button options: <code>buttonType</code> (buy, pay, checkout, order, plain, ...), <code>buttonColor</code> (default, black, white), <code>buttonSizeMode</code>, <code>buttonRadius</code>. Sheet options: <code>emailRequired</code>, <code>billingAddressRequired</code>, <code>shippingAddressRequired</code>, <code>existingPaymentMethodRequired</code>.</p>
+      </div>
+
+      <div class="card">
         <h2>Test data</h2>
         <dl class="kv">
           <dt>Visa (3DS2 challenge)</dt><dd>4917 6100 0000 0000 · 03/30 · 737</dd>
@@ -38,6 +50,7 @@
           <dt>3DS2 password</dt><dd>password</dd>
           <dt>Refusal</dt><dd>Use holder name <code>DECLINED</code> or a wrong CVC</dd>
           <dt>iDEAL (country NL)</dt><dd>Pick any test bank, then choose the outcome on the simulator</dd>
+          <dt>Google Pay</dt><dd>Chrome on localhost/HTTPS; any card in your Google account (TEST mode, not charged)</dd>
         </dl>
         <p class="muted">Full list: <a href="https://docs.adyen.com/development-resources/testing/test-card-numbers" target="_blank" rel="noopener">Adyen test card numbers</a>.</p>
       </div>

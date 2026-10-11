@@ -1,13 +1,13 @@
 const express = require("express");
-const crypto = require("crypto");
 const { checkout } = require("../adyen");
 const { config, getBaseUrl } = require("../config");
-const { buildOrder, countries, products } = require("../catalog");
+const { buildOrder, countries, products, newReference } = require("../catalog");
 const orders = require("../orders");
 const log = require("../eventLog");
+const { truncate, describeAdyenError } = require("../util");
 
 const router = express.Router();
-const DEMO_SHOPPER_REFERENCE = "demo-shopper-001";
+const { tokenisationFields } = require("../catalog");
 
 // Public settings the browser needs. The client key is safe to expose;
 // the API key never leaves the server.
@@ -32,7 +32,7 @@ router.post("/sessions", async (req, res) => {
     return res.status(400).json({ error: err.message });
   }
 
-  const reference = `ORDER-${Date.now()}-${crypto.randomBytes(3).toString("hex")}`;
+  const reference = newReference();
   const sessionRequest = {
     merchantAccount: config.merchantAccount,
     amount: order.amount,
@@ -49,12 +49,7 @@ router.post("/sessions", async (req, res) => {
   // Tokenisation: with a shopperReference, Drop-in shows the shopper's stored cards
   // and a "save for next time" checkbox. Use your own stable customer id in production.
   if (storePaymentMethod) {
-    Object.assign(sessionRequest, {
-      shopperReference: DEMO_SHOPPER_REFERENCE,
-      storePaymentMethodMode: "askForConsent",
-      recurringProcessingModel: "CardOnFile",
-      shopperInteraction: "Ecommerce",
-    });
+    Object.assign(sessionRequest, tokenisationFields, { storePaymentMethodMode: "askForConsent" });
   }
 
   log.record("server", "POST /sessions → Adyen", sessionRequest);
@@ -114,24 +109,5 @@ router.delete("/events", (req, res) => {
   log.clear();
   res.status(204).end();
 });
-
-function truncate(value, length = 48) {
-  return typeof value === "string" && value.length > length ? `${value.slice(0, length)}… (${value.length} chars)` : value;
-}
-
-function describeAdyenError(err) {
-  let body;
-  try {
-    body = err.responseBody ? JSON.parse(err.responseBody) : undefined;
-  } catch {
-    body = err.responseBody;
-  }
-  return {
-    status: err.statusCode,
-    message: body?.message || err.message,
-    errorCode: body?.errorCode || err.errorCode,
-    errorType: body?.errorType,
-  };
-}
 
 module.exports = router;
